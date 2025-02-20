@@ -2,6 +2,9 @@ package li.doerf.sinematograf.eventstore.service;
 
 import java.time.Instant;
 
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,6 +18,9 @@ import li.doerf.sinematograf.eventstore.events.Event;
 @ApplicationScoped
 public class EventService implements IEventService {
 
+    @Channel("cinema-events") 
+    Emitter<QueueEvent> eventEmitter; 
+    
     @Override
     public Uni persist(Event event) throws JsonProcessingException {
 
@@ -30,8 +36,12 @@ public class EventService implements IEventService {
                 null,
                 Instant.now()
             );
-            // 
-            return Panache.withTransaction(entity::persist);
+            
+            return Panache.withTransaction(() -> {
+                var x = entity.persist();
+                eventEmitter.send(new QueueEvent(event.getClass().getName(), event));
+                return x;
+            });
         } finally {
             Log.info("Event persisted: %s".formatted(event));
         }
