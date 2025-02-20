@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Cinema",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Create cinema
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/cinema
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Kino ABC",
+    "street": "Seestrasse 27",
+    "zip": "8001",
+    "city": "Zurich"
+  }
+}

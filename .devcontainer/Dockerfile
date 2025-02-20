@@ -3,6 +3,7 @@ FROM mcr.microsoft.com/devcontainers/base:bookworm
 ARG JAVA_VARIANT=temurin
 ARG JAVA_VERSION=23
 ARG QUARKUS_VERSION=3.18
+ARG MAVEN_VERSION=3
 
 USER vscode
 
@@ -11,8 +12,12 @@ RUN echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc
 
 RUN /home/vscode/.local/bin/mise install -y java@${JAVA_VARIANT}-${JAVA_VERSION}
 RUN /home/vscode/.local/bin/mise use -g java@$JAVA_VARIANT-$JAVA_VERSION
+
 RUN /home/vscode/.local/bin/mise install -y quarkus@$QUARKUS_VERSION
 RUN /home/vscode/.local/bin/mise use -g quarkus@$QUARKUS_VERSION
+
+RUN /home/vscode/.local/bin/mise install -y maven@$MAVEN_VERSION
+RUN /home/vscode/.local/bin/mise use -g maven@$MAVEN_VERSION
 
 
 # [Optional] Uncomment this section to install additional OS packages.
