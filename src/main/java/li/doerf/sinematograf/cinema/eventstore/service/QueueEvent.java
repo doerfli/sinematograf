@@ -1,6 +1,6 @@
-package li.doerf.sinematograf.eventstore.service;
+package li.doerf.sinematograf.cinema.eventstore.service;
 
-import li.doerf.sinematograf.eventstore.events.Event;
+import li.doerf.sinematograf.cinema.eventstore.events.Event;
 
 public class QueueEvent {
 

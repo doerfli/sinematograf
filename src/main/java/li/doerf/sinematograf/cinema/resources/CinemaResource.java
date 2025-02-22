@@ -8,8 +8,8 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import li.doerf.sinematograf.cinema.event.CinemaCreated;
+import li.doerf.sinematograf.cinema.eventstore.service.IEventService;
 import li.doerf.sinematograf.cinema.resources.requests.CinemaDto;
-import li.doerf.sinematograf.eventstore.service.IEventService;
 
 @Path("/cinema")
 // @ApplicationScoped

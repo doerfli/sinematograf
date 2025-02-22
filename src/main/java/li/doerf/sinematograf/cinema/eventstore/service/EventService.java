@@ -1,4 +1,4 @@
-package li.doerf.sinematograf.eventstore.service;
+package li.doerf.sinematograf.cinema.eventstore.service;
 
 import java.time.Instant;
 
@@ -9,11 +9,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.quarkus.hibernate.reactive.panache.Panache;
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
-import li.doerf.sinematograf.eventstore.entity.EventEntity;
-import li.doerf.sinematograf.eventstore.events.Event;
+import li.doerf.sinematograf.cinema.eventstore.entity.EventEntity;
+import li.doerf.sinematograf.cinema.eventstore.events.Event;
 
 @ApplicationScoped
 public class EventService implements IEventService {
@@ -22,7 +23,7 @@ public class EventService implements IEventService {
     Emitter<QueueEvent> eventEmitter; 
     
     @Override
-    public Uni persist(Event event) throws JsonProcessingException {
+    public Uni<PanacheEntityBase> persist(Event event) throws JsonProcessingException {
 
         ObjectMapper objectMapper = new ObjectMapper();
 

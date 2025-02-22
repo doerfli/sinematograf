@@ -1,4 +1,4 @@
-package li.doerf.sinematograf.eventstore.events;
+package li.doerf.sinematograf.cinema.eventstore.events;
 
 public class Event {
     

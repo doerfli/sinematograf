@@ -1,4 +1,4 @@
-package li.doerf.sinematograf.cinema.processor;
+package li.doerf.sinematograf.cinema.receiver;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.hibernate.reactive.mutiny.Mutiny;
@@ -14,15 +14,15 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import li.doerf.sinematograf.cinema.entity.CinemaEntity;
 import li.doerf.sinematograf.cinema.event.CinemaCreated;
-import li.doerf.sinematograf.eventstore.service.QueueEvent;
+import li.doerf.sinematograf.cinema.eventstore.service.QueueEvent;
 
 @ApplicationScoped
-public class EventsProcessor {
+public class EventsReceiver {
 
     @Inject
     Mutiny.SessionFactory sessionFactory;
 
-    @Incoming("cinema-events-processor")           
+    @Incoming("cinema-events-receiver")           
     @NonBlocking
     @WithSession
     // @WithTransaction         

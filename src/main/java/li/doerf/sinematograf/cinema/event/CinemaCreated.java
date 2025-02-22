@@ -1,6 +1,6 @@
 package li.doerf.sinematograf.cinema.event;
 
-import li.doerf.sinematograf.eventstore.events.Event;
+import li.doerf.sinematograf.cinema.eventstore.events.Event;
 
 public class CinemaCreated extends Event {
 

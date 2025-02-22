@@ -1,4 +1,4 @@
-package li.doerf.sinematograf.eventstore.entity;
+package li.doerf.sinematograf.cinema.eventstore.entity;
 
 import java.time.Instant;
 
