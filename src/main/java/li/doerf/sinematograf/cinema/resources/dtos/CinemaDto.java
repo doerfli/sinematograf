@@ -1,4 +1,4 @@
-package li.doerf.sinematograf.cinema.resources.requests;
+package li.doerf.sinematograf.cinema.resources.dtos;
 
 public record CinemaDto( 
     String name,

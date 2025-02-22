@@ -1,10 +1,7 @@
 package li.doerf.sinematograf.cinema.receiver;
 
-import java.time.Instant;
-
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
-import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.quarkus.logging.Log;
@@ -12,12 +9,18 @@ import io.smallrye.common.annotation.NonBlocking;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
-import li.doerf.sinematograf.cinema.entity.CinemaEntity;
 import li.doerf.sinematograf.cinema.event.CinemaCreated;
 import li.doerf.sinematograf.cinema.eventstore.service.QueueEvent;
+import li.doerf.sinematograf.cinema.service.ICinemaService;
 
 @ApplicationScoped
 public class EventsReceiver {
+
+    private ICinemaService cinemaService;
+
+    public EventsReceiver(ICinemaService cinemaService) {
+        this.cinemaService = cinemaService;
+    }
 
     @Incoming("cinema-events-receiver")           
     @NonBlocking
@@ -48,19 +51,7 @@ public class EventsReceiver {
 
     private Uni<PanacheEntityBase> process(CinemaCreated event) {
         Log.debug("Processing CinemaCreated event: %s".formatted(event));
-        CinemaEntity cinema = new CinemaEntity(
-            event.getAggregateId(),
-            Instant.now(),
-            Instant.now(),
-            event.getName(),
-            event.getStreet(),
-            event.getZip(),
-            event.getCity()
-        );
-
-        return Panache.withTransaction(cinema::persist).onItem().invoke(() -> {
-            Log.info("Cinema entity persisted: %s".formatted(cinema));
-        });
+        return cinemaService.createCinema(event);
     }
     
 }
