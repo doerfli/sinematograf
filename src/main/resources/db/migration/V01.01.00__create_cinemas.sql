@@ -1,5 +1,7 @@
 CREATE TABLE cinemas (
-    id SERIAL,
+    id VARCHAR(36),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
     name VARCHAR(255) NOT NULL,
     street VARCHAR(255) NOT NULL,
     zip VARCHAR(255) NOT NULL,

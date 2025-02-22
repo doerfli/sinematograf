@@ -1,8 +1,8 @@
 package li.doerf.sinematograf.cinema.event;
 
-import li.doerf.sinematograf.cinema.eventstore.events.Event;
+import li.doerf.sinematograf.cinema.eventstore.events.BaseEvent;
 
-public class CinemaCreated extends Event {
+public class CinemaCreated extends BaseEvent {
 
     private String name;
     private String street;

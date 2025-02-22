@@ -1,47 +1,73 @@
 package li.doerf.sinematograf.cinema.entity;
 
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import java.time.Instant;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
 
 @Entity(name = "cinemas")
 @Cacheable
-public class CinemaEntity extends PanacheEntityBase {
+public class CinemaEntity extends BaseEntity {
     
-    @Id
-    @SequenceGenerator(name="pk_sequence",sequenceName="cinemas_id_seq", allocationSize=1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pk_sequence")
-    public Long id;
     @Column(name = "name")
-    public String name;
+    private String name;
     @Column(name = "street")
-    public String street;
+    private String street;
     @Column(name = "zip")
-    public String zip;
+    private String zip;
     @Column(name = "city")
-    public String city;
+    private String city;
     
     public CinemaEntity() {
     }
 
     public CinemaEntity(
-        Long id,
+        String id,
+        Instant createdAt,
+        Instant updatedAt,
         String name,
         String street,
         String zip,
         String city
     ) {
-        this.id = id;
+        super(id, createdAt, updatedAt);
         this.name = name;
         this.street = street;
         this.zip = zip;
         this.city = city;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
 
 }

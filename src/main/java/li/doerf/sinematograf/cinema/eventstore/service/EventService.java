@@ -14,16 +14,19 @@ import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import li.doerf.sinematograf.cinema.eventstore.entity.EventEntity;
-import li.doerf.sinematograf.cinema.eventstore.events.Event;
+import li.doerf.sinematograf.cinema.eventstore.events.BaseEvent;
 
 @ApplicationScoped
 public class EventService implements IEventService {
 
-    @Channel("cinema-events") 
-    Emitter<QueueEvent> eventEmitter; 
+    private Emitter<QueueEvent> eventEmitter; 
+
+    public EventService(@Channel("cinema-events") Emitter<QueueEvent> eventEmitter) {
+        this.eventEmitter = eventEmitter;
+    }
     
     @Override
-    public Uni<PanacheEntityBase> persist(Event event) throws JsonProcessingException {
+    public Uni<PanacheEntityBase> persist(BaseEvent event) throws JsonProcessingException {
 
         ObjectMapper objectMapper = new ObjectMapper();
 

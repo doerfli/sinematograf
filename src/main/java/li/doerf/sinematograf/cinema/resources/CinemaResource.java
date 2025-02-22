@@ -15,9 +15,11 @@ import li.doerf.sinematograf.cinema.resources.requests.CinemaDto;
 // @ApplicationScoped
 public class CinemaResource {
 
-    @Inject
     private IEventService eventService;
 
+    public CinemaResource(IEventService eventService) {
+        this.eventService = eventService;
+    }
 
     @POST
     public Uni create(CinemaDto cinema) throws Exception {

@@ -1,18 +1,18 @@
 package li.doerf.sinematograf.cinema.eventstore.service;
 
-import li.doerf.sinematograf.cinema.eventstore.events.Event;
+import li.doerf.sinematograf.cinema.eventstore.events.BaseEvent;
 
 public class QueueEvent {
 
     private String cls;
-    private Event event;
+    private BaseEvent event;
 
-    public QueueEvent(String cls, Event event) {
+    public QueueEvent(String cls, BaseEvent event) {
         this.cls = cls;
         this.event = event;
     }
 
-    public Event getEvent() {
+    public BaseEvent getEvent() {
         return event;
     }
 
