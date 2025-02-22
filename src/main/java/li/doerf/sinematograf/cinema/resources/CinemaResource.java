@@ -9,20 +9,22 @@ import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import li.doerf.sinematograf.cinema.entity.CinemaEntity;
 import li.doerf.sinematograf.cinema.event.CinemaCreated;
 import li.doerf.sinematograf.cinema.eventstore.service.IEventService;
 import li.doerf.sinematograf.cinema.resources.dtos.CinemaDto;
 import li.doerf.sinematograf.cinema.resources.dtos.CinemaOutDto;
+import li.doerf.sinematograf.cinema.service.ICinemaService;
 
 @Path("/cinema")
 // @ApplicationScoped
 public class CinemaResource {
 
     private IEventService eventService;
+    private ICinemaService cinemaService;
 
-    public CinemaResource(IEventService eventService) {
+    public CinemaResource(IEventService eventService, ICinemaService cinemaService) {
         this.eventService = eventService;
+        this.cinemaService = cinemaService;
     }
 
     @POST
@@ -44,14 +46,8 @@ public class CinemaResource {
 
     @GET
     public Uni<List<CinemaOutDto>> listAll() {
-        return CinemaEntity.<CinemaEntity>listAll().onItem().transform(entities -> {
-            return entities.stream().map(e -> 
-            new CinemaOutDto(
-                e.getId(),
-                e.getName(),
-                e.getStreet(),
-                e.getZip(),
-                e.getCity())).toList();
+        return cinemaService.getAll().onItem().transform(entities -> {
+            return entities.stream().map(e -> CinemaOutDto.from(e)).toList();
         });
     }
 

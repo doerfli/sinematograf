@@ -1,6 +1,7 @@
 package li.doerf.sinematograf.cinema.service;
 
 import java.time.Instant;
+import java.util.List;
 
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
@@ -27,6 +28,10 @@ public class CinemaService implements ICinemaService {
         return Panache.withTransaction(cinema::persist).onItem().invoke(() -> {
             Log.info("Cinema entity persisted: %s".formatted(cinema));
         });
+    }
+
+    public Uni<List<CinemaEntity>> getAll() {
+        return CinemaEntity.<CinemaEntity>listAll();
     }
 
 }
