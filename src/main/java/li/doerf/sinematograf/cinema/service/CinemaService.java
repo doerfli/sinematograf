@@ -10,6 +10,7 @@ import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import li.doerf.sinematograf.cinema.entity.CinemaEntity;
 import li.doerf.sinematograf.cinema.event.CinemaCreated;
+import li.doerf.sinematograf.cinema.resources.dtos.CinemaDto;
 
 @ApplicationScoped
 public class CinemaService implements ICinemaService {
@@ -32,6 +33,12 @@ public class CinemaService implements ICinemaService {
 
     public Uni<List<CinemaEntity>> getAll() {
         return CinemaEntity.<CinemaEntity>listAll();
+    }
+
+    public Uni<Boolean> exists(CinemaDto cinema) {
+        return CinemaEntity.count("name = ?1 and street = ?2 and zip = ?3 and city = ?4",
+            cinema.name(), cinema.street(), cinema.zip(), cinema.city())
+            .onItem().transform(count -> count > 0);
     }
 
 }
