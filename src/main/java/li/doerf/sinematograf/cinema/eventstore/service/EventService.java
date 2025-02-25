@@ -7,6 +7,7 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
@@ -20,16 +21,17 @@ import li.doerf.sinematograf.cinema.eventstore.events.BaseEvent;
 public class EventService implements IEventService {
 
     private Emitter<QueueEvent> eventEmitter; 
+    private ObjectMapper objectMapper;
 
     public EventService(@Channel("cinema-events") Emitter<QueueEvent> eventEmitter) {
         this.eventEmitter = eventEmitter;
+        objectMapper = new ObjectMapper();
+        JavaTimeModule module = new JavaTimeModule();
+        objectMapper.registerModule(module);
     }
     
     @Override
     public Uni<PanacheEntityBase> persist(BaseEvent event) throws JsonProcessingException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
         try {
             var entity = new EventEntity(
                 null,

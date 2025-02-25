@@ -13,9 +13,11 @@ import io.smallrye.mutiny.unchecked.Unchecked;
 import jakarta.persistence.EntityExistsException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
 import li.doerf.sinematograf.cinema.event.CinemaCreated;
+import li.doerf.sinematograf.cinema.event.CinemaUpdated;
 import li.doerf.sinematograf.cinema.eventstore.service.IEventService;
 import li.doerf.sinematograf.cinema.resources.dtos.CinemaDto;
 import li.doerf.sinematograf.cinema.resources.dtos.CinemaOutDto;
@@ -48,6 +50,7 @@ public class CinemaResource {
                 var event = new CinemaCreated(
                     UUID.randomUUID().toString(),
                     "Cinema",
+                    
                     cinema.name(),
                     cinema.street(),
                     cinema.zip(),
@@ -56,6 +59,29 @@ public class CinemaResource {
 
                 return eventService.persist(event);
             }));
+    }
+
+    @PUT
+    public Uni<PanacheEntityBase> update(CinemaDto cinema) {
+        // persist cinema
+        Log.debug("Updating cinema: {}".formatted(cinema));
+
+        return cinemaService.exists(cinema.id()).onItem().transformToUni(Unchecked.function(has -> {
+            if (!has) {
+                throw new EntityExistsException("Cinema does not exist");
+            }
+
+            var event = new CinemaUpdated(
+                cinema.id(),
+                "Cinema",
+                cinema.name(),
+                cinema.street(),
+                cinema.zip(),
+                cinema.city()
+            );
+
+            return eventService.persist(event);
+        }));
     }
 
     @GET

@@ -1,0 +1,21 @@
+meta {
+  name: Update cinema
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:8080/cinema
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": "98138faf-e900-40fc-a8ee-21dcaca002e8",
+    "name": "Kino ABC 6",
+    "street": "Seestrasse 28",
+    "zip": "8001",
+    "city": "Zurich"
+  }
+}

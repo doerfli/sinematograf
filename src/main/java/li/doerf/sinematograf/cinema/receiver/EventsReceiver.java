@@ -10,6 +10,7 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
 import li.doerf.sinematograf.cinema.event.CinemaCreated;
+import li.doerf.sinematograf.cinema.event.CinemaUpdated;
 import li.doerf.sinematograf.cinema.eventstore.service.QueueEvent;
 import li.doerf.sinematograf.cinema.service.ICinemaService;
 
@@ -44,6 +45,8 @@ public class EventsReceiver {
         // Log.info("Processing event: %s".formatted(event));
         if (event instanceof CinemaCreated) {
             return process((CinemaCreated) event);
+        } else if (event instanceof CinemaUpdated) {
+            return process((CinemaUpdated) event);
         }
 
         return Uni.createFrom().nullItem();
@@ -52,6 +55,11 @@ public class EventsReceiver {
     private Uni<PanacheEntityBase> process(CinemaCreated event) {
         Log.debug("Processing CinemaCreated event: %s".formatted(event));
         return cinemaService.createCinema(event);
+    }
+
+    private Uni<PanacheEntityBase> process(CinemaUpdated event) {
+        Log.debug("Processing CinemaUpdated event: %s".formatted(event));
+        return cinemaService.updateCinema(event);
     }
     
 }
