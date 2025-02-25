@@ -3,6 +3,7 @@ package li.doerf.sinematograf.cinema.resources;
 import java.util.List;
 import java.util.UUID;
 
+import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
@@ -39,18 +40,18 @@ public class CinemaResource {
     @POST
     public Uni<PanacheEntityBase> create(CinemaDto cinema) throws Exception {
         // persist cinema
-        Log.debug("Creating cinema: {}".formatted(cinema));
+        Log.debug("Creating cinema: %s".formatted(cinema));
 
         return cinemaService.exists(cinema)
             .onItem().transformToUni(Unchecked.function(has -> {
                 if (has) {
+                    Log.debug("Cinema already exists: %s".formatted(cinema));
                     throw new EntityExistsException("Cinema already exists");
                 }
 
                 var event = new CinemaCreated(
                     UUID.randomUUID().toString(),
                     "Cinema",
-                    
                     cinema.name(),
                     cinema.street(),
                     cinema.zip(),
@@ -62,17 +63,19 @@ public class CinemaResource {
     }
 
     @PUT
-    public Uni<PanacheEntityBase> update(CinemaDto cinema) {
+    @Path("/{id}")
+    public Uni<PanacheEntityBase> update(@RestPath String id, CinemaDto cinema) {
         // persist cinema
-        Log.debug("Updating cinema: {}".formatted(cinema));
+        Log.debug("Updating cinema: %s".formatted(cinema));
 
-        return cinemaService.exists(cinema.id()).onItem().transformToUni(Unchecked.function(has -> {
+        return cinemaService.exists(id).onItem().transformToUni(Unchecked.function(has -> {
             if (!has) {
+                Log.debug("Cinema does not exist: %s".formatted(id));
                 throw new EntityExistsException("Cinema does not exist");
             }
 
             var event = new CinemaUpdated(
-                cinema.id(),
+                id,
                 "Cinema",
                 cinema.name(),
                 cinema.street(),
