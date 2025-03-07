@@ -2,13 +2,12 @@ package li.doerf.sinematograf.cinema.receiver;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
-import io.quarkus.hibernate.reactive.panache.common.WithSession;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.logging.Log;
-import io.smallrye.common.annotation.NonBlocking;
-import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.annotations.Blocking;
 import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import li.doerf.sinematograf.cinema.event.CinemaCreated;
 import li.doerf.sinematograf.cinema.event.CinemaUpdated;
 import li.doerf.sinematograf.cinema.eventstore.service.QueueEvent;
@@ -23,11 +22,10 @@ public class EventsReceiver {
         this.cinemaService = cinemaService;
     }
 
-    @Incoming("cinema-events-receiver")           
-    @NonBlocking
-    @WithSession
-    // @WithTransaction         
-    public Uni<PanacheEntityBase> process(JsonObject obj) throws InterruptedException, ClassNotFoundException {
+    @Incoming("cinema-events-receiver")
+    @Blocking
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public PanacheEntityBase process(JsonObject obj) throws InterruptedException, ClassNotFoundException {
         // Log.info(obj.toString());
         // Log.info(obj.getClass());
         var eventJsonObj = obj.getJsonObject("event");
@@ -41,23 +39,22 @@ public class EventsReceiver {
         // Log.info(event.getClass().getSimpleName());
     }
 
-    private Uni<PanacheEntityBase> process(Object event) {
+    private PanacheEntityBase process(Object event) {       
         // Log.info("Processing event: %s".formatted(event));
         if (event instanceof CinemaCreated) {
             return process((CinemaCreated) event);
         } else if (event instanceof CinemaUpdated) {
             return process((CinemaUpdated) event);
         }
-
-        return Uni.createFrom().nullItem();
+        return null;
     }
 
-    private Uni<PanacheEntityBase> process(CinemaCreated event) {
+    private PanacheEntityBase process(CinemaCreated event) {
         Log.debug("Processing CinemaCreated event: %s".formatted(event));
         return cinemaService.createCinema(event);
     }
 
-    private Uni<PanacheEntityBase> process(CinemaUpdated event) {
+    private PanacheEntityBase process(CinemaUpdated event) {
         Log.debug("Processing CinemaUpdated event: %s".formatted(event));
         return cinemaService.updateCinema(event);
     }

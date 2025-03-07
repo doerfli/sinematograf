@@ -2,12 +2,11 @@ package li.doerf.sinematograf.cinema.eventstore.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
-import io.smallrye.mutiny.Uni;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import li.doerf.sinematograf.cinema.eventstore.events.BaseEvent;
 
 public interface IEventService {
 
-    Uni<PanacheEntityBase> persist(BaseEvent event) throws JsonProcessingException;
+    PanacheEntityBase persist(BaseEvent event) throws JsonProcessingException;
 
 }

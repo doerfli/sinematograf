@@ -7,11 +7,10 @@ import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.logging.Log;
-import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.unchecked.Unchecked;
 import jakarta.persistence.EntityExistsException;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -38,44 +37,18 @@ public class CinemaResource {
     }
 
     @POST
-    public Uni<PanacheEntityBase> create(CinemaDto cinema) throws Exception {
+    @Transactional
+    public PanacheEntityBase create(CinemaDto cinema) throws Exception {
         // persist cinema
         Log.debug("Creating cinema: %s".formatted(cinema));
 
-        return cinemaService.exists(cinema)
-            .onItem().transformToUni(Unchecked.function(has -> {
-                if (has) {
-                    Log.debug("Cinema already exists: %s".formatted(cinema));
-                    throw new EntityExistsException("Cinema already exists");
-                }
-
-                var event = new CinemaCreated(
-                    UUID.randomUUID().toString(),
-                    "Cinema",
-                    cinema.name(),
-                    cinema.street(),
-                    cinema.zip(),
-                    cinema.city()
-                );
-
-                return eventService.persist(event);
-            }));
-    }
-
-    @PUT
-    @Path("/{id}")
-    public Uni<PanacheEntityBase> update(@RestPath String id, CinemaDto cinema) {
-        // persist cinema
-        Log.debug("Updating cinema: %s".formatted(cinema));
-
-        return cinemaService.exists(id).onItem().transformToUni(Unchecked.function(has -> {
-            if (!has) {
-                Log.debug("Cinema does not exist: %s".formatted(id));
-                throw new EntityExistsException("Cinema does not exist");
+            if (cinemaService.exists(cinema)) {
+                Log.debug("Cinema already exists: %s".formatted(cinema));
+                throw new EntityExistsException("Cinema already exists");
             }
 
-            var event = new CinemaUpdated(
-                id,
+            var event = new CinemaCreated(
+                UUID.randomUUID().toString(),
                 "Cinema",
                 cinema.name(),
                 cinema.street(),
@@ -84,14 +57,35 @@ public class CinemaResource {
             );
 
             return eventService.persist(event);
-        }));
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Transactional
+    public PanacheEntityBase update(@RestPath String id, CinemaDto cinema) throws Exception {
+        // persist cinema
+        Log.debug("Updating cinema: %s".formatted(cinema));
+
+        if (!cinemaService.exists(id)) {
+            Log.debug("Cinema does not exist: %s".formatted(id));
+            throw new EntityExistsException("Cinema does not exist");
+        }
+
+        var event = new CinemaUpdated(
+            id,
+            "Cinema",
+            cinema.name(),
+            cinema.street(),
+            cinema.zip(),
+            cinema.city()
+        );
+
+        return eventService.persist(event);
     }
 
     @GET
-    public Uni<List<CinemaOutDto>> listAll() {
-        return cinemaService.getAll().onItem().transform(entities -> {
-            return entities.stream().map(e -> CinemaOutDto.from(e)).toList();
-        });
+    public List<CinemaOutDto> listAll() {
+        return cinemaService.getAll().stream().map(e -> CinemaOutDto.from(e)).toList();
     }
 
     @ServerExceptionMapper(EntityExistsException.class)

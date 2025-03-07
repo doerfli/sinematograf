@@ -2,7 +2,9 @@ package li.doerf.sinematograf.cinema.eventstore.entity;
 
 import java.time.Instant;
 
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import org.hibernate.annotations.ColumnTransformer;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +18,7 @@ import jakarta.persistence.SequenceGenerator;
 public class EventEntity extends PanacheEntityBase {
 
     @Id
-    @SequenceGenerator(name="pk_sequence",sequenceName="events_id_seq", allocationSize=1)
+    @SequenceGenerator(name="pk_sequence", sequenceName="events_id_seq", allocationSize=1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pk_sequence")
     public Long id;
     @Column(name = "aggregate_id")
@@ -26,8 +28,10 @@ public class EventEntity extends PanacheEntityBase {
     @Column(name = "event_type")
     public String eventType;
     @Column(name = "event_data")
+    @ColumnTransformer(write = "?::jsonb")
     public String eventData;
     @Column(name = "event_metadata")
+    @ColumnTransformer(write = "?::jsonb")
     public String eventMetadata;
     @Column(name = "event_timestamp")
     public Instant eventTimestamp;

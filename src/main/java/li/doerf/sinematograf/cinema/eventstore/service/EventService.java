@@ -9,11 +9,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import io.quarkus.hibernate.reactive.panache.Panache;
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.logging.Log;
-import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import li.doerf.sinematograf.cinema.eventstore.entity.EventEntity;
 import li.doerf.sinematograf.cinema.eventstore.events.BaseEvent;
 
@@ -31,9 +30,9 @@ public class EventService implements IEventService {
     }
     
     @Override
-    public Uni<PanacheEntityBase> persist(BaseEvent event) throws JsonProcessingException {
+    public PanacheEntityBase persist(BaseEvent event) throws JsonProcessingException {
         try {
-            var entity = new EventEntity(
+            var entity = storeEvent(new EventEntity(
                 null,
                 event.getAggregateId(),
                 event.getAggregateType(),
@@ -41,16 +40,20 @@ public class EventService implements IEventService {
                 objectMapper.writeValueAsString(event),
                 null,
                 Instant.now()
-            );
+            ));
             
-            return Panache.withTransaction(() -> {
-                var x = entity.persist();
-                eventEmitter.send(new QueueEvent(event.getClass().getName(), event));
-                return x;
-            });
+            eventEmitter.send(new QueueEvent(event.getClass().getName(), event));
+            return entity;
         } finally {
-            Log.info("Event persisted: %s".formatted(event));
+            
         }
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public PanacheEntityBase storeEvent(EventEntity entity) {
+        entity.persist();
+        Log.info("EventEntity persisted: %s".formatted(entity));
+        return entity;
     }
 
 }
