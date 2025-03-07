@@ -3,6 +3,7 @@ package li.doerf.sinematograf.cinema.resources;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.containsString;
 
@@ -14,6 +15,7 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import li.doerf.sinematograf.cinema.PostgresDBTestResource;
+import li.doerf.sinematograf.cinema.entity.CinemaEntity;
 
 @QuarkusTest
 @TestHTTPEndpoint(CinemaResource.class)
@@ -51,6 +53,8 @@ class CinemaResourceTest {
                 .body(containsString(cinemaName));
             return true;
         });
+
+        assertThat(CinemaEntity.count()).isEqualTo(1);
     }
 
 }

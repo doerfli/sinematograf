@@ -10,7 +10,7 @@ import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
 public class PostgresDBTestResource implements QuarkusTestResourceLifecycleManager {
     
-    private PostgreSQLContainer postgres;
+    private PostgreSQLContainer<?> postgres;
 
     @Override
     public Map<String, String> start() {
