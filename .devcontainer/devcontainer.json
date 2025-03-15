@@ -35,7 +35,8 @@
 				"vscode-icons-team.vscode-icons",
 				"RaillyHugo.one-hunter",
 				"vscjava.vscode-java-pack",
-				"redhat.vscode-quarkus"
+				"redhat.vscode-quarkus",
+				"cweijan.vscode-database-client2"
 			]
 		}
 	},
