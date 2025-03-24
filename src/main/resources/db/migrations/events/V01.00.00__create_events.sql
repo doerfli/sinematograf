@@ -1,5 +1,5 @@
 CREATE TABLE events (
-    id SERIAL,
+    id bigint GENERATED ALWAYS AS IDENTITY,
     aggregate_id VARCHAR(255) NOT NULL,
     aggregate_type VARCHAR(255) NOT NULL,
     event_type VARCHAR(255) NOT NULL,

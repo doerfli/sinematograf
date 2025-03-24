@@ -5,8 +5,10 @@ import java.time.Instant;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Entity(name = "cinemas")
+@Table(schema = "cinema")
 @Cacheable
 public class CinemaEntity extends BaseEntity {
     
