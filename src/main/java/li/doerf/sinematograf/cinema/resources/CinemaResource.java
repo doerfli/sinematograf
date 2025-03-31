@@ -7,7 +7,6 @@ import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.logging.Log;
 import jakarta.persistence.EntityExistsException;
 import jakarta.transaction.Transactional;
@@ -38,31 +37,33 @@ public class CinemaResource {
 
     @POST
     @Transactional
-    public PanacheEntityBase create(CinemaDto cinema) throws Exception {
+    public String create(CinemaDto cinema) throws Exception {
         // persist cinema
         Log.debug("Creating cinema: %s".formatted(cinema));
 
-            if (cinemaService.exists(cinema)) {
-                Log.debug("Cinema already exists: %s".formatted(cinema));
-                throw new EntityExistsException("Cinema already exists");
-            }
+        if (cinemaService.exists(cinema)) {
+            Log.debug("Cinema already exists: %s".formatted(cinema));
+            throw new EntityExistsException("Cinema already exists");
+        }
 
-            var event = new CinemaCreated(
-                UUID.randomUUID().toString(),
-                "Cinema",
-                cinema.name(),
-                cinema.street(),
-                cinema.zip(),
-                cinema.city()
-            );
+        var event = new CinemaCreated(
+            UUID.randomUUID().toString(),
+            "Cinema",
+            cinema.name(),
+            cinema.street(),
+            cinema.zip(),
+            cinema.city()
+        );
 
-            return eventService.persist(event);
+        eventService.emit(event);
+
+        return "cinema created";
     }
 
     @PUT
     @Path("/{id}")
     @Transactional
-    public PanacheEntityBase update(@RestPath String id, CinemaDto cinema) throws Exception {
+    public String update(@RestPath String id, CinemaDto cinema) throws Exception {
         // persist cinema
         Log.debug("Updating cinema: %s".formatted(cinema));
 
@@ -80,7 +81,9 @@ public class CinemaResource {
             cinema.city()
         );
 
-        return eventService.persist(event);
+        eventService.emit(event);
+
+        return "Cinema updated";
     }
 
     @GET

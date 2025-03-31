@@ -1,5 +1,10 @@
 package li.doerf.sinematograf.cinema.event;
 
+import java.time.Instant;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import li.doerf.sinematograf.cinema.eventstore.events.BaseEvent;
 
 public class CinemaCreated extends BaseEvent {
@@ -18,6 +23,23 @@ public class CinemaCreated extends BaseEvent {
         String city
     ) {
         super(aggregateId, aggregateType);
+        this.name = name;
+        this.street = street;
+        this.zip = zip;
+        this.city = city;
+    }
+
+    @JsonCreator
+    public CinemaCreated(
+        @JsonProperty("aggregateId") String aggregateId, 
+        @JsonProperty("aggregateType") String aggregateType,
+        @JsonProperty("eventTimestamp") Instant eventTimestamp,
+        @JsonProperty("name") String name,
+        @JsonProperty("street") String street,
+        @JsonProperty("zip") String zip,
+        @JsonProperty("city") String city
+    ) {
+        super(aggregateId, aggregateType, eventTimestamp);
         this.name = name;
         this.street = street;
         this.zip = zip;

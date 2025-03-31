@@ -2,6 +2,11 @@ package li.doerf.sinematograf.cinema.receiver;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.logging.Log;
 import io.smallrye.reactive.messaging.annotations.Blocking;
@@ -10,33 +15,36 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import li.doerf.sinematograf.cinema.event.CinemaCreated;
 import li.doerf.sinematograf.cinema.event.CinemaUpdated;
-import li.doerf.sinematograf.cinema.eventstore.service.QueueEvent;
 import li.doerf.sinematograf.cinema.service.ICinemaService;
+import li.doerf.sinematograf.eventstore.Event;
 
 @ApplicationScoped
 public class EventsReceiver {
 
     private ICinemaService cinemaService;
+    private ObjectMapper objectMapper;
 
     public EventsReceiver(ICinemaService cinemaService) {
         this.cinemaService = cinemaService;
+        this.objectMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
     }
 
-    @Incoming("cinema-events-receiver")
+    @Incoming("cinema-events-rcv")
     @Blocking
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public PanacheEntityBase process(JsonObject obj) throws InterruptedException, ClassNotFoundException {
-        // Log.info(obj.toString());
-        // Log.info(obj.getClass());
-        var eventJsonObj = obj.getJsonObject("event");
-        QueueEvent evt = obj.mapTo(QueueEvent.class);
-        var realEventClass = Class.forName(evt.getCls());
-        var realEvent = eventJsonObj.mapTo(realEventClass);
-        // Log.info(realEvent.getClass());
-        return process(realEvent);
-        // Log.info(event.getAggregateId());
-        // Log.info(event.getAggregateType());
-        // Log.info(event.getClass().getSimpleName());
+    public void process(JsonObject obj) throws InterruptedException, ClassNotFoundException, JsonProcessingException {
+        Log.info(obj.toString());
+        try {
+            var eventStr = obj.getString("eventData");
+            Event evt = obj.mapTo(Event.class);
+            var realEventClass = Class.forName(evt.eventType);
+            Log.info(eventStr);
+            var realEvent = objectMapper.readValue(eventStr, realEventClass);
+            Log.info(realEvent);
+            process(realEvent);
+        } catch (Exception e) {
+            Log.error("caught unexpected exception while processing incoming event", e);
+        }
     }
 
     private PanacheEntityBase process(Object event) {       

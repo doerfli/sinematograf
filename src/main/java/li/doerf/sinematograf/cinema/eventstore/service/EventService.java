@@ -9,20 +9,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
-import li.doerf.sinematograf.cinema.eventstore.entity.EventEntity;
 import li.doerf.sinematograf.cinema.eventstore.events.BaseEvent;
+import li.doerf.sinematograf.eventstore.Event;
 
 @ApplicationScoped
 public class EventService implements IEventService {
 
-    private Emitter<QueueEvent> eventEmitter; 
+    private Emitter<Event> eventEmitter; 
     private ObjectMapper objectMapper;
 
-    public EventService(@Channel("cinema-events") Emitter<QueueEvent> eventEmitter) {
+    public EventService(@Channel("cinema-events-emit") Emitter<Event> eventEmitter) {
         this.eventEmitter = eventEmitter;
         objectMapper = new ObjectMapper();
         JavaTimeModule module = new JavaTimeModule();
@@ -30,30 +27,17 @@ public class EventService implements IEventService {
     }
     
     @Override
-    public PanacheEntityBase persist(BaseEvent event) throws JsonProcessingException {
-        try {
-            var entity = storeEvent(new EventEntity(
-                null,
-                event.getAggregateId(),
-                event.getAggregateType(),
-                event.getClass().getSimpleName(),
-                objectMapper.writeValueAsString(event),
-                null,
-                Instant.now()
-            ));
-            
-            eventEmitter.send(new QueueEvent(event.getClass().getName(), event));
-            return entity;
-        } finally {
-            
-        }
-    }
-
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public PanacheEntityBase storeEvent(EventEntity entity) {
-        entity.persist();
-        Log.info("EventEntity persisted: %s".formatted(entity));
-        return entity;
+    public void emit(BaseEvent event) throws JsonProcessingException {
+        Event send = new Event(
+            event.getAggregateId(),
+            event.getAggregateType(),
+            event.getClass().getName(),
+            objectMapper.writeValueAsString(event),
+            null,
+            Instant.now()
+        );
+        
+        eventEmitter.send(send);
     }
 
 }
