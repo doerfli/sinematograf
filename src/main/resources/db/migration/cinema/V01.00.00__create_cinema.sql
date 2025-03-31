@@ -1,4 +1,4 @@
-CREATE TABLE cinemas (
+CREATE TABLE cinema (
     id VARCHAR(36),
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,

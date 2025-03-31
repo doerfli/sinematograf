@@ -2,12 +2,10 @@ package li.doerf.sinematograf.cinema.entity;
 
 import java.time.Instant;
 
-import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
-@Entity(name = "cinemas")
-@Cacheable
+@Entity(name="cinema")
 public class CinemaEntity extends BaseEntity {
     
     @Column(name = "name")
