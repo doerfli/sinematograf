@@ -10,7 +10,11 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 3
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 3
